@@ -24,7 +24,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
-        value: https://study.aakashmunawar.com
+        value: https://study.aakashmunawar.com,https://study-group-matcher-kappa.vercel.app
       - key: DB_HOST
         sync: false
       - key: DB_NAME
