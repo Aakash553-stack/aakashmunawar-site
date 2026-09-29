@@ -106,7 +106,7 @@
 
   // ----------------------------------------------------------------- charts
 
-  function renderChart(key, config, isEmpty) {
+  function renderChart(key, config, isEmpty, emptyText = "No incidents match these filters.") {
     const canvas = document.getElementById(`chart-${key}`);
     const box = canvas.parentElement;
     box.querySelector(".empty-note")?.remove();
@@ -120,7 +120,7 @@
     if (isEmpty) {
       const note = document.createElement("div");
       note.className = "empty-note";
-      note.textContent = "No incidents match these filters.";
+      note.textContent = emptyText;
       box.appendChild(note);
     }
   }
@@ -158,7 +158,7 @@
           borderColor: COLORS.accent,
           backgroundColor: "rgba(76,141,255,0.12)",
           fill: true,
-          tension: 0.25,
+          cubicInterpolationMode: "monotone",   // smooth, but never overshoots below 0
           pointRadius: 4,
           pointBackgroundColor: rows.map((r) => (r.partial ? "transparent" : COLORS.accent)),
           pointBorderColor: COLORS.accent,
@@ -216,14 +216,21 @@
     }, max === 0);
   }
 
-  function drawArrest(rows) {
-    document.getElementById("arrest-note").textContent =
-      `Share of incidents with an arrest recorded, for categories with at least ${ARREST_MIN_INCIDENTS} incidents in the current selection.`;
+  function arrestMinIncidents(filters) {
+    // With a category chosen, always show it; otherwise skip tiny categories.
+    return filters.category ? 1 : ARREST_MIN_INCIDENTS;
+  }
+
+  function drawArrest(rows, minIncidents) {
+    document.getElementById("arrest-note").textContent = minIncidents > 1
+      ? `Share of incidents with an arrest recorded, for categories with at least ${minIncidents} incidents in the current selection.`
+      : "Share of incidents with an arrest recorded.";
     renderChart("arrest", {
       type: "bar",
       data: {
         labels: rows.map((r) => title(r.category)),
-        datasets: [{ label: "Arrest rate", data: rows.map((r) => r.arrest_rate_pct), backgroundColor: COLORS.accent }],
+        datasets: [{ label: "Arrest rate", data: rows.map((r) => r.arrest_rate_pct), backgroundColor: COLORS.accent,
+                     maxBarThickness: 36 }],
       },
       options: {
         indexAxis: "y",
@@ -240,7 +247,9 @@
           },
         },
       },
-    }, rows.length === 0);
+    }, rows.length === 0, minIncidents > 1
+          ? `No category has ${minIncidents}+ incidents in this selection.`
+          : "No incidents match these filters.");
   }
 
   function drawDistricts(rows) {
@@ -387,7 +396,8 @@
         api("stats/incidents-by-hour", filters, signal).then(drawHour),
         api("stats/monthly-trend", filters, signal).then(drawMonthly),
         api("stats/day-of-week", filters, signal).then(drawDayOfWeek),
-        api("stats/arrest-rate-by-category", { ...filters, min_incidents: ARREST_MIN_INCIDENTS }, signal).then(drawArrest),
+        api("stats/arrest-rate-by-category", { ...filters, min_incidents: arrestMinIncidents(filters) }, signal)
+          .then((rows) => drawArrest(rows, arrestMinIncidents(filters))),
         api("stats/top-categories-by-district", filters, signal).then(drawDistricts),
         api("stats/community-area-domestic-share", filters, signal).then(drawAreas),
       );
