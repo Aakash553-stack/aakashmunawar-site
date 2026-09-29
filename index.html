@@ -368,6 +368,31 @@
     text-align:center;
   }
   .projects-empty strong{color:var(--text);}
+  /* Cards with more than one link: the title link stretches over the whole
+     card, and .project-more sits above it so it stays separately clickable. */
+  div.project{position:relative;}
+  .project-link{color:inherit;text-decoration:none;}
+  .project-link::after{content:"";position:absolute;inset:0;border-radius:8px;}
+  div.project:has(.project-link:focus-visible){outline:2px solid var(--accent);outline-offset:2px;}
+  .project-findings{
+    color:var(--muted);
+    font-size:0.84rem;
+    max-width:54ch;
+    margin:10px 0 0;
+    padding-left:1.1em;
+  }
+  .project-findings li{margin-top:4px;}
+  .project-findings li::marker{color:var(--accent2);}
+  .project-more{
+    position:relative;
+    z-index:1;
+    display:inline-block;
+    margin-top:12px;
+    font-size:0.78rem;
+    color:var(--accent);
+    text-decoration:none;
+  }
+  .project-more:hover{text-decoration:underline;}
 
   /* ---- Contact ---- */
   .contact-card{
@@ -506,8 +531,22 @@
           <span class="project-year mono-label">2026</span>
         </a>
       -->
-      <div class="projects-empty">
-        <strong>Nothing here yet.</strong> First project's in progress — check back soon.
+      <div class="project">
+        <span class="project-num mono-label">01</span>
+        <div>
+          <div class="project-title"><a class="project-link" href="https://github.com/Aakash553-stack/aakashmunawar-site/tree/master/projects/crime-data-explorer" target="_blank" rel="noopener">Crime Data Explorer</a></div>
+          <div class="project-desc">A SQL analysis of nearly 480,000 real Chicago Police Department incident reports (Sept 2024 – Aug 2026), built from a normalized relational database designed from scratch — not a flat spreadsheet.</div>
+          <ul class="project-findings">
+            <li>Reported crime fell about 5% year over year, with a clear seasonal cycle — lowest in February, highest in late summer/early fall</li>
+            <li>Incidents peak around 3 p.m. and are rarest around 5 a.m.</li>
+            <li>Theft dominates downtown and the North Side (up to 41% of incidents in some districts); battery leads across the South and West Sides</li>
+            <li>Arrest rates vary hugely by crime type — almost all narcotics reports lead to an arrest, versus under 1 in 10 thefts</li>
+            <li>Domestic-related incidents range from 4% to over 30% of reports depending on the neighborhood</li>
+          </ul>
+          <div class="project-tags"><span>Python</span><span>SQLite</span><span>pandas</span><span>matplotlib</span><span>Jupyter</span></div>
+          <a class="project-more" href="https://github.com/Aakash553-stack/aakashmunawar-site/blob/master/projects/crime-data-explorer/notebooks/explorer.ipynb" target="_blank" rel="noopener">View notebook with charts →</a>
+        </div>
+        <span class="project-year mono-label">2026</span>
       </div>
     </div>
   </section>
