@@ -11,11 +11,39 @@ A full-stack web app for Rutgers–New Brunswick students.
 **Stack:** Java 21, Spring Boot 4.1 (Web MVC, Data JPA, Security), JWT auth, PostgreSQL,
 Flyway, JUnit 5. The frontend is plain HTML, CSS and JavaScript.
 
-**Real data only.** The course list is the real Fall 2026 Rutgers Computer Science (198) and
-Mathematics (640) catalog: 148 courses from the Rutgers Schedule of Classes, the same data
-as [Schedule Builder](../schedule-builder/). The app ships with **no fake users or groups**;
-everything in it was created by people using it. Randomly generated data appears only in
-the test and benchmark code, where it's labeled as such.
+## Try it
+
+Click **Try the demo** on the login page, or log in by hand:
+
+| Email | Password |
+|---|---|
+| `recruiter@example.com` | `demo1234` |
+
+**What the demo account starts with:**
+
+- three real courses and weekly free time,
+- one study group already joined,
+- four ranked matches: two groups to join and two classmates to start a group with.
+
+**What the demo data is:** the demo account's classmates and groups are sample accounts,
+all labeled "(demo)". They live in a **separate sandbox**:
+
+- real students never see demo accounts or demo groups, in matches, group lists or joins;
+- the demo account never sees real students, so a public login exposes nobody's name or
+  free time.
+
+**Resetting:** the demo account works like any other account, so you can edit its courses
+and free time, and join, leave or create groups. It can only ever affect the demo sandbox.
+[`DemoSeeder`](backend/src/main/java/com/aakashmunawar/studygroups/service/DemoSeeder.java)
+deletes and rebuilds the sandbox each time the server starts. The free Render instance
+restarts after 15 idle minutes, so most visitors get a fresh demo. The other demo accounts
+can't log in.
+
+**Real data otherwise.** The course list is the real Fall 2026 Rutgers Computer Science
+(198) and Mathematics (640) catalog: 148 courses from the Rutgers Schedule of Classes, the
+same data as [Schedule Builder](../schedule-builder/). Apart from the labeled demo sandbox,
+everything in the app is created by the people using it. Randomly generated data appears
+only in the test and benchmark code.
 
 ## Architecture
 
@@ -57,7 +85,7 @@ students ─┬─< student_courses >── courses (148 real Rutgers courses)
 
 | Table | Columns | Notes |
 |---|---|---|
-| `students` | id, email (unique, lower-cased), password_hash (BCrypt), display_name, created_at | Other students only ever see `display_name`; emails aren't returned. |
+| `students` | id, email (unique, lower-cased), password_hash (BCrypt), display_name, created_at, demo | Other students only ever see `display_name`; emails aren't returned. `demo` marks the sandbox accounts (migration V3), and `@example.com` sign-ups are reserved for them. |
 | `courses` | id, code (unique, e.g. `198:112`), title | Seeded by migration; read-only. |
 | `student_courses` | student_id, course_id (composite PK) | The courses a student takes. Indexed by course, to find classmates. |
 | `availability_blocks` | id, student_id, day_of_week (1–7, ISO), start_minute, end_minute | Weekly free time as half-open `[start, end)` minutes. CHECK constraints enforce `0 ≤ start < end ≤ 1440`. Stored merged: overlapping blocks are combined on save. |
@@ -169,7 +197,8 @@ against brute force.
   ranking.
 
 **API tests** ([`ApiTest`](backend/src/test/java/com/aakashmunawar/studygroups/api/ApiTest.java),
-11 tests) make real HTTP requests through Spring Security, with real JWTs, against H2:
+11 tests, and [`DemoTest`](backend/src/test/java/com/aakashmunawar/studygroups/api/DemoTest.java),
+5 tests) make real HTTP requests through Spring Security, with real JWTs, against H2:
 
 - sign-up and login, including duplicate emails, validation, and a wrong password and an
   unknown email getting identical answers,
@@ -179,9 +208,12 @@ against brute force.
 - every group rule,
 - a full end-to-end matching scenario,
 - no emails leaking to other students,
-- CORS.
+- CORS,
+- the demo account: its one-click login, its exact starting ranking, isolation from real
+  students in both directions, and a reset restoring the sandbox without touching real
+  accounts.
 
-**All 36 tests pass.**
+**All 41 tests pass.**
 
 ### Performance (measured)
 
@@ -231,7 +263,7 @@ H2 database in PostgreSQL mode, so no database setup is needed.
 
 ```bash
 cd projects/study-group-matcher/backend
-./mvnw test                      # all 36 tests
+./mvnw test                      # all 41 tests
 ./mvnw spring-boot:run           # API on http://localhost:8080
 
 # in another terminal
