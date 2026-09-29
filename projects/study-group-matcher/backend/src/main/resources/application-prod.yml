@@ -1,0 +1,13 @@
+# Production: PostgreSQL. Connection details come from the environment
+# (set by the host, e.g. Render's database-to-service bindings).
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 5      # free-tier Postgres allows few connections
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+  require-strong-secret: true

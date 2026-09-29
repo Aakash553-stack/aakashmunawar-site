@@ -1,0 +1,33 @@
+# Default profile: local development and tests on an in-memory H2 database in
+# PostgreSQL mode, so the app runs with no setup. Production uses the "prod"
+# profile (application-prod.yml) against a real PostgreSQL instance.
+spring:
+  application:
+    name: study-group-matcher
+  datasource:
+    url: jdbc:h2:mem:studygroups;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: validate        # Flyway owns the schema; Hibernate only checks it
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+app:
+  jwt:
+    # Dev-only default. Production must set JWT_SECRET (checked at startup).
+    secret: ${JWT_SECRET:local-development-secret-not-for-production-use-0123456789}
+    ttl-hours: ${JWT_TTL_HOURS:24}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5500,http://127.0.0.1:5500}
