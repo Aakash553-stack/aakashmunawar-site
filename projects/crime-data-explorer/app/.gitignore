@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+# Produced by build.py from committed sources
+backend/data/crime.db
+backend/sql/

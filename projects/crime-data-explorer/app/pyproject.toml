@@ -1,0 +1,18 @@
+[project]
+name = "crime-explorer"
+version = "1.0.0"
+description = "FastAPI backend and dashboard for the Chicago crime data explorer"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141",
+]
+
+# Local development and tests also need uvicorn and httpx: see requirements-dev.txt.
+
+# Vercel: load the FastAPI app from backend/main.py and run build.py after
+# installing dependencies (it unpacks the database and copies queries.sql).
+[tool.vercel]
+entrypoint = "backend.main:app"
+
+[tool.vercel.scripts]
+build = "python build.py"

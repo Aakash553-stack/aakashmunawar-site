@@ -7,6 +7,14 @@ Jupyter notebook.
 
 **Stack:** Python, SQLite, pandas, matplotlib, Jupyter
 
+## Web dashboard
+
+The same six analyses are also available as an interactive dashboard, with filters for
+date range, category, district, community area, arrest and domestic flags. It has a
+FastAPI backend over `crime.db` and a Chart.js frontend. The backend reuses
+[`sql/queries.sql`](sql/queries.sql) directly, adding filters to each query. See
+[`app/README.md`](app/README.md).
+
 ## Data
 
 Everything comes from the [City of Chicago Data Portal](https://data.cityofchicago.org):

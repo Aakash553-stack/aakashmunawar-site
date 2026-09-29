@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chicago Crime Explorer</title>
+<meta name="description" content="Interactive dashboard of Chicago Police Department incident reports, September 2024 to August 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="back mono-label" href="https://aakashmunawar.com/#projects">← aakashmunawar.com</a>
+    <h1>Chicago Crime Explorer</h1>
+    <p class="lede">
+      <span id="total-note">Chicago Police Department incident reports</span>, from the
+      <a href="https://data.cityofchicago.org/d/ijzp-q8t2" target="_blank" rel="noopener">City of Chicago Data Portal</a>.
+      Filter below; every chart and the table update together.
+    </p>
+  </header>
+
+  <form id="filters" class="filters" autocomplete="off">
+    <label class="field">
+      <span class="mono-label">From</span>
+      <input type="date" name="start">
+    </label>
+    <label class="field">
+      <span class="mono-label">To</span>
+      <input type="date" name="end">
+    </label>
+    <label class="field">
+      <span class="mono-label">Category</span>
+      <select name="category"><option value="">All categories</option></select>
+    </label>
+    <label class="field">
+      <span class="mono-label">District</span>
+      <select name="district"><option value="">All districts</option></select>
+    </label>
+    <label class="field">
+      <span class="mono-label">Community area</span>
+      <select name="community_area"><option value="">All areas</option></select>
+    </label>
+    <fieldset class="field toggle">
+      <legend class="mono-label">Arrest</legend>
+      <div class="seg">
+        <label><input type="radio" name="arrest" value="" checked><span>Any</span></label>
+        <label><input type="radio" name="arrest" value="true"><span>Yes</span></label>
+        <label><input type="radio" name="arrest" value="false"><span>No</span></label>
+      </div>
+    </fieldset>
+    <fieldset class="field toggle">
+      <legend class="mono-label">Domestic</legend>
+      <div class="seg">
+        <label><input type="radio" name="domestic" value="" checked><span>Any</span></label>
+        <label><input type="radio" name="domestic" value="true"><span>Yes</span></label>
+        <label><input type="radio" name="domestic" value="false"><span>No</span></label>
+      </div>
+    </fieldset>
+    <button type="reset" class="reset">Reset</button>
+  </form>
+
+  <section class="kpis" aria-live="polite">
+    <div class="kpi"><span class="mono-label">Incidents</span><strong id="kpi-incidents">–</strong></div>
+    <div class="kpi"><span class="mono-label">Arrest made</span><strong id="kpi-arrest">–</strong></div>
+    <div class="kpi"><span class="mono-label">Domestic-related</span><strong id="kpi-domestic">–</strong></div>
+  </section>
+
+  <p id="status" class="status" role="status"></p>
+
+  <section class="grid">
+    <article class="card wide">
+      <div class="card-head">
+        <h2>Incidents by hour of day</h2>
+        <p>Timestamps of exactly 00:00 or 12:00 are shaded lighter: they're far more common than any other minute and are most likely placeholders for an unknown time.</p>
+      </div>
+      <div class="chart"><canvas id="chart-hour"></canvas></div>
+    </article>
+
+    <article class="card wide">
+      <div class="card-head">
+        <h2>Monthly trend</h2>
+        <p>Incidents per month. Hover for month-over-month and year-over-year change. Months cut off by the date filter are drawn hollow.</p>
+      </div>
+      <div class="chart"><canvas id="chart-month"></canvas></div>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h2>Average per day of week</h2>
+        <p>Average incidents per calendar day, counting days with none as zero.</p>
+      </div>
+      <div class="chart tall"><canvas id="chart-dow"></canvas></div>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h2>Arrest rate by category</h2>
+        <p id="arrest-note">Share of incidents with an arrest recorded.</p>
+      </div>
+      <div class="chart tall"><canvas id="chart-arrest"></canvas></div>
+    </article>
+
+    <article class="card wide">
+      <div class="card-head">
+        <h2>Top categories by district</h2>
+        <p>The three most common categories in each police district, as a share of that district's incidents.</p>
+      </div>
+      <div class="chart tall"><canvas id="chart-district"></canvas></div>
+    </article>
+
+    <article class="card wide">
+      <div class="card-head">
+        <h2>Community areas: volume and domestic share</h2>
+        <p>The 15 community areas with the most incidents. Counts are not adjusted for population.</p>
+      </div>
+      <div class="chart tall"><canvas id="chart-area"></canvas></div>
+    </article>
+  </section>
+
+  <section class="card table-card">
+    <div class="card-head">
+      <h2>Incidents</h2>
+      <p id="table-note">Newest first.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Date &amp; time</th><th>Category</th><th>Description</th><th>Location</th>
+            <th>Block</th><th>District</th><th>Community area</th><th>Arrest</th><th>Domestic</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <nav class="pager" aria-label="Table pages">
+      <button type="button" id="prev">← Prev</button>
+      <span id="page-info" class="mono-label"></span>
+      <button type="button" id="next">Next →</button>
+    </nav>
+  </section>
+
+  <footer class="foot">
+    Data: City of Chicago Data Portal, "Crimes – 2001 to Present" (ijzp-q8t2). Addresses are published at block level.
+    Reported incidents only; recent records may since have been revised.
+    <a href="api/docs">API docs</a> ·
+    <a href="https://github.com/Aakash553-stack/aakashmunawar-site/tree/master/projects/crime-data-explorer" target="_blank" rel="noopener">Source</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
+        integrity="sha512-CQBWl4fJHWbryGE+Pc7UAxWMUMNMWzWxF4SQo9CgkJIN1kx6djDQZjh3Y8SZ1d+6I+1zze6Z7kHXO7q3UyZAWw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="app.js"></script>
+</body>
+</html>
