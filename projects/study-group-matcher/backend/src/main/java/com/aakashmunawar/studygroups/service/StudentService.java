@@ -38,6 +38,9 @@ public class StudentService {
 
     public AuthResponse signup(SignupRequest req) {
         String email = normalizeEmail(req.email());
+        if (email.endsWith("@" + DemoSeeder.DEMO_EMAIL_DOMAIN)) {
+            throw ApiException.badRequest("Addresses at " + DemoSeeder.DEMO_EMAIL_DOMAIN + " are reserved for demo accounts");
+        }
         if (students.existsByEmail(email)) {
             throw ApiException.conflict("An account with that email already exists");
         }

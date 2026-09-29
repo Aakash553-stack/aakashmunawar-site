@@ -45,16 +45,17 @@ public class MatchService {
 
         // 1. Who is already in a group, per course (for my courses only).
         Map<Long, Set<Long>> groupCoursesByStudent = new HashMap<>();
-        for (Object[] row : groups.findMembershipsByCourseIds(myCourses)) {
+        boolean demo = seeker.isDemo();   // real students and demo accounts never see each other
+        for (Object[] row : groups.findMembershipsByCourseIds(myCourses, demo)) {
             groupCoursesByStudent.computeIfAbsent((Long) row[0], k -> new HashSet<>()).add((Long) row[1]);
         }
 
         // 2. Existing groups for my courses, with members.
-        List<StudyGroup> candidateGroups = groups.findWithMembersByCourseIds(myCourses);
+        List<StudyGroup> candidateGroups = groups.findWithMembersByCourseIds(myCourses, demo);
 
         // 3. Classmates, with the shared courses in which they have no group.
         Map<Long, Set<Long>> peerCourses = new HashMap<>();
-        for (Object[] row : students.findEnrollments(myCourses, me)) {
+        for (Object[] row : students.findEnrollments(myCourses, me, demo)) {
             long student = (Long) row[0];
             long course = (Long) row[1];
             if (!groupCoursesByStudent.getOrDefault(student, Set.of()).contains(course)) {

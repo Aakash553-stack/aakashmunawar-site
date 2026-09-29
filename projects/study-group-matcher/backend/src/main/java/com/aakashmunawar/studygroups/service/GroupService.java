@@ -29,7 +29,8 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public List<GroupDto> forCourse(long viewerId, long courseId) {
-        return groups.findWithMembersByCourseIds(List.of(courseId)).stream()
+        boolean demo = studentService.load(viewerId).isDemo();
+        return groups.findWithMembersByCourseIds(List.of(courseId), demo).stream()
                 .map(g -> Mapper.group(g, viewerId)).toList();
     }
 
@@ -40,7 +41,9 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public GroupDetailDto detail(long viewerId, long groupId) {
-        StudyGroup g = groups.findById(groupId).orElseThrow(() -> ApiException.notFound("Group"));
+        StudyGroup g = groups.findById(groupId)
+                .filter(x -> sameSandbox(x, studentService.load(viewerId)))
+                .orElseThrow(() -> ApiException.notFound("Group"));
         List<MemberDto> members = g.getMembers().stream().map(m -> Mapper.member(m.getStudent(), g)).toList();
         WeeklySchedule common = WeeklySchedule.intersectAll(
                 g.getMembers().stream().map(m -> Mapper.schedule(m.getStudent())).toList());
@@ -59,11 +62,13 @@ public class GroupService {
 
     public GroupDto join(long viewerId, long groupId) {
         // Row lock: concurrent joins for the last seat are serialized here.
-        StudyGroup g = groups.findByIdForUpdate(groupId).orElseThrow(() -> ApiException.notFound("Group"));
+        Student me = studentService.load(viewerId);
+        StudyGroup g = groups.findByIdForUpdate(groupId)
+                .filter(x -> sameSandbox(x, me))
+                .orElseThrow(() -> ApiException.notFound("Group"));
         if (g.hasMember(viewerId)) {
             throw ApiException.conflict("You're already in this group");
         }
-        Student me = studentService.load(viewerId);
         requireEligible(me, g.getCourse());
         if (g.isFull()) {
             throw ApiException.conflict("This group is full");
@@ -82,6 +87,11 @@ public class GroupService {
         } else if (g.getOwner().getId().equals(viewerId)) {
             g.setOwner(g.getMembers().get(0).getStudent());   // longest-standing member
         }
+    }
+
+    /** Real students and demo accounts can't see or join each other's groups. */
+    private static boolean sameSandbox(StudyGroup g, Student viewer) {
+        return g.getOwner().isDemo() == viewer.isDemo();
     }
 
     private void requireEligible(Student me, Course course) {

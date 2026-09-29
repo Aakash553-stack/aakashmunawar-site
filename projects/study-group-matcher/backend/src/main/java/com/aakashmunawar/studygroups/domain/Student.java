@@ -27,6 +27,10 @@ public class Student {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
+    /** Part of the demo sandbox (see DemoSeeder); invisible to real students. */
+    @Column(nullable = false)
+    private boolean demo;
+
     @ManyToMany
     @JoinTable(name = "student_courses",
             joinColumns = @JoinColumn(name = "student_id"),
@@ -41,9 +45,14 @@ public class Student {
     }
 
     public Student(String email, String passwordHash, String displayName) {
+        this(email, passwordHash, displayName, false);
+    }
+
+    public Student(String email, String passwordHash, String displayName, boolean demo) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.displayName = displayName;
+        this.demo = demo;
     }
 
     public Long getId() { return id; }
@@ -52,6 +61,7 @@ public class Student {
     public String getDisplayName() { return displayName; }
     public void setDisplayName(String displayName) { this.displayName = displayName; }
     public Instant getCreatedAt() { return createdAt; }
+    public boolean isDemo() { return demo; }
     public Set<Course> getCourses() { return courses; }
     public List<AvailabilityBlock> getAvailability() { return availability; }
 }

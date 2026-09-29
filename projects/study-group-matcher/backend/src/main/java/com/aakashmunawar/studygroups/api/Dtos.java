@@ -48,7 +48,7 @@ public final class Dtos {
     public record CourseDto(long id, String code, String title) {
     }
 
-    public record ProfileDto(long id, String email, String displayName,
+    public record ProfileDto(long id, String email, String displayName, boolean demo,
                              List<CourseDto> courses, List<BlockDto> availability) {
     }
 

@@ -29,7 +29,7 @@ final class Mapper {
     static ProfileDto profile(Student s) {
         List<CourseDto> courses = s.getCourses().stream()
                 .sorted(Comparator.comparing(Course::getCode)).map(Mapper::course).toList();
-        return new ProfileDto(s.getId(), s.getEmail(), s.getDisplayName(), courses, blocks(schedule(s)));
+        return new ProfileDto(s.getId(), s.getEmail(), s.getDisplayName(), s.isDemo(), courses, blocks(schedule(s)));
     }
 
     static GroupDto group(StudyGroup g, long viewerId) {

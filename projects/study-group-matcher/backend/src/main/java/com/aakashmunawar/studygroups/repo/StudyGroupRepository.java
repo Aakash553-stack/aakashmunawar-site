@@ -12,13 +12,18 @@ import org.springframework.data.repository.query.Param;
 
 public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 
-    /** Groups for the given courses, with members loaded in the same query. */
+    /**
+     * Groups for the given courses in one sandbox, with members loaded in the
+     * same query. A group belongs to its owner's sandbox, and only students
+     * from that sandbox can ever join it.
+     */
     @Query("""
             select distinct g from StudyGroup g
             left join fetch g.members m left join fetch m.student
-            where g.course.id in :courseIds
+            where g.course.id in :courseIds and g.owner.demo = :demo
             order by g.id""")
-    List<StudyGroup> findWithMembersByCourseIds(@Param("courseIds") Collection<Long> courseIds);
+    List<StudyGroup> findWithMembersByCourseIds(@Param("courseIds") Collection<Long> courseIds,
+                                                @Param("demo") boolean demo);
 
     @Query("""
             select distinct g from StudyGroup g join g.members m
@@ -30,9 +35,12 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
     @Query("select g from StudyGroup g where g.id = :id")
     Optional<StudyGroup> findByIdForUpdate(@Param("id") long id);
 
-    /** (studentId, courseId) for every membership in groups for the given courses. */
+    /** (studentId, courseId) for memberships in groups for the given courses, in one sandbox. */
     @Query("""
             select m.student.id, g.course.id from GroupMembership m join m.group g
-            where g.course.id in :courseIds""")
-    List<Object[]> findMembershipsByCourseIds(@Param("courseIds") Collection<Long> courseIds);
+            where g.course.id in :courseIds and m.student.demo = :demo""")
+    List<Object[]> findMembershipsByCourseIds(@Param("courseIds") Collection<Long> courseIds,
+                                              @Param("demo") boolean demo);
+
+    List<StudyGroup> findByOwnerDemoTrue();
 }

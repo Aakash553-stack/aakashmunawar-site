@@ -14,12 +14,18 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     boolean existsByEmail(String email);
 
-    /** (studentId, courseId) for every other student taking any of the given courses. */
+    /**
+     * (studentId, courseId) for every other student taking any of the given
+     * courses, within one sandbox (real or demo).
+     */
     @Query("""
             select s.id, c.id from Student s join s.courses c
-            where c.id in :courseIds and s.id <> :excludeId""")
+            where c.id in :courseIds and s.id <> :excludeId and s.demo = :demo""")
     List<Object[]> findEnrollments(@Param("courseIds") Collection<Long> courseIds,
-                                   @Param("excludeId") long excludeId);
+                                   @Param("excludeId") long excludeId,
+                                   @Param("demo") boolean demo);
+
+    List<Student> findByDemoTrue();
 
     List<Student> findByIdIn(Collection<Long> ids);
 }
