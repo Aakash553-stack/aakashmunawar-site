@@ -81,6 +81,18 @@ button.primary:hover:not(:disabled){filter:brightness(1.1);background:var(--acce
 .create{border-top:1px solid var(--line);margin-top:16px;padding-top:14px;}
 .create h3{font-size:0.9rem;margin:0 0 10px;}
 
+/* Demo */
+.demo-box{margin-bottom:16px;}
+.demo-box .hint{margin:10px 0 0;}
+button.wide{width:100%;padding:11px 14px;}
+code{font-family:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:0 4px;}
+.divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:0.75rem;margin:4px 0 16px;}
+.divider::before, .divider::after{content:"";flex:1;height:1px;background:var(--line);}
+.banner{
+  margin:18px 0 0;padding:10px 14px;border-radius:8px;font-size:0.8rem;color:var(--text);
+  background:rgba(232,146,58,0.1);border:1px solid rgba(232,146,58,0.4);
+}
+
 /* Course chips and search */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
 .chip{

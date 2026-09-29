@@ -8,12 +8,16 @@
   const API = LOCAL ? "http://localhost:8080" : window.STUDY_API_BASE;
   const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];   // ISO 1..7
   const GRID_START = 7 * 60, GRID_END = 23 * 60, SLOT = 30;         // weekly grid: 7am-11pm
+  // The shared demo account (created by the backend's DemoSeeder; also in the README).
+  const DEMO = { email: "recruiter@example.com", password: "demo1234" };
 
   const $ = (sel) => document.querySelector(sel);
   const statusEl = $("#status");
   let token = storage("get", "sgm_token");
   let profile = null;
   let catalog = null;          // all courses, loaded once
+  let flash = null;            // message to show after the next navigation
+  let preselectCourse = null;  // course to pick when the groups view opens
 
   // ------------------------------------------------------------------ helpers
 
@@ -98,11 +102,14 @@
     else if (view === "auth" || !views.includes(view)) view = "matches";
     for (const v of views) $(`#view-${v}`).hidden = v !== view;
     $("#nav").hidden = !token;
+    $("#demo-banner").hidden = !(token && profile?.demo);
     document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("active", a.hash === `#/${view}`));
-    say("");
+    say(flash || "");
+    flash = null;
     if (view === "auth") return;
     await run(async () => {
       profile = profile || await api("/api/me");
+      $("#demo-banner").hidden = !profile.demo;
       catalog = catalog || await api("/api/courses");
       if (view === "matches") await showMatches();
       if (view === "groups") await showGroups();
@@ -110,12 +117,21 @@
     });
   }
 
+  /** Go to a view exactly once: a hash change triggers route(); otherwise render directly. */
+  async function go(hash) {
+    if (location.hash !== hash) {
+      location.hash = hash;          // the hashchange listener renders it
+    } else {
+      await route();
+    }
+  }
+
   function logout(message) {
     token = null;
     profile = null;
     storage("del", "sgm_token");
-    location.hash = "#/auth";
-    route().then(() => message && say(message));
+    flash = message || null;
+    go("#/auth");
   }
 
   // --------------------------------------------------------------------- auth
@@ -130,21 +146,23 @@
     $("#auth-submit").textContent = authMode === "signup" ? "Create account" : "Log in";
   }));
 
+  async function signIn(mode, body) {
+    const res = await api(`/api/auth/${mode}`, { method: "POST", body });
+    token = res.token;
+    profile = res.student;
+    storage("set", "sgm_token", token);
+    await go(mode === "signup" ? "#/profile" : "#/matches");
+  }
+
   $("#auth-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const f = e.target;
     const body = { email: f.email.value, password: f.password.value };
     if (authMode === "signup") body.displayName = f.displayName.value;
-    run(async () => {
-      const res = await api(`/api/auth/${authMode}`, { method: "POST", body });
-      token = res.token;
-      profile = res.student;
-      storage("set", "sgm_token", token);
-      f.reset();
-      location.hash = authMode === "signup" ? "#/profile" : "#/matches";
-      await route();
-    });
+    run(async () => { await signIn(authMode, body); f.reset(); });
   });
+
+  $("#try-demo").addEventListener("click", () => run(() => signIn("login", DEMO)));
 
   $("#logout").addEventListener("click", () => logout("Logged out."));
 
@@ -152,20 +170,15 @@
 
   async function showMatches() {
     const box = $("#matches");
-    box.replaceChildren();
     if (!profile.courses.length || !profile.availability.length) {
-      box.append(el("div", { class: "empty" }, "Add your courses and weekly free time on the ",
+      box.replaceChildren(el("div", { class: "empty" }, "Add your courses and weekly free time on the ",
         el("a", { href: "#/profile" }, "Profile"), " page to get matches."));
       return;
     }
     const recs = await api("/api/matches?limit=20");
-    if (!recs.length) {
-      box.append(el("div", { class: "empty" },
-        "No matches yet: nobody who shares a course with you (and isn't already in a group for it) is free when you are. ",
-        "Try adding more free time, or ", el("a", { href: "#/groups" }, "start a group"), " so classmates can find you."));
-      return;
-    }
-    recs.forEach((r, i) => box.append(matchCard(r, i + 1)));
+    box.replaceChildren(...(recs.length ? recs.map((r, i) => matchCard(r, i + 1)) : [el("div", { class: "empty" },
+      "No matches yet: nobody who shares a course with you (and isn't already in a group for it) is free when you are. ",
+      "Try adding more free time, or ", el("a", { href: "#/groups" }, "start a group"), " so classmates can find you.")]));
   }
 
   function matchCard(r, rank) {
@@ -190,8 +203,8 @@
     } else {
       const course = r.sharedCourses[0];
       action = el("button", { onclick: () => {
-        location.hash = "#/groups";
-        setTimeout(() => { $("#browse-course").value = course.id; $("#browse-course").dispatchEvent(new Event("change")); }, 0);
+        preselectCourse = course.id;
+        go("#/groups");
       } }, `Start a ${course.code} group`);
     }
     return el("article", { class: "item" }, head,
@@ -206,13 +219,15 @@
 
   async function showGroups() {
     const mine = await api("/api/groups/mine");
-    const box = $("#my-groups");
-    box.replaceChildren();
-    if (!mine.length) box.append(el("div", { class: "empty" }, "You're not in any groups yet."));
-    for (const g of mine) box.append(await groupCard(g, true));
+    const cards = await Promise.all(mine.map((g) => groupCard(g, true)));
+    $("#my-groups").replaceChildren(...(cards.length ? cards : [el("div", { class: "empty" }, "You're not in any groups yet.")]));
 
     const select = $("#browse-course");
     select.replaceChildren(...profile.courses.map((c) => el("option", { value: c.id }, courseLabel(c))));
+    if (preselectCourse) {
+      select.value = preselectCourse;
+      preselectCourse = null;
+    }
     $("#create-group").hidden = !profile.courses.length;
     if (!profile.courses.length) {
       $("#course-groups").replaceChildren(el("div", { class: "empty" }, "Add courses on your ",
@@ -225,10 +240,9 @@
   async function showCourseGroups() {
     const courseId = $("#browse-course").value;
     const groups = await api(`/api/groups?courseId=${encodeURIComponent(courseId)}`);
-    const box = $("#course-groups");
-    box.replaceChildren();
-    if (!groups.length) box.append(el("div", { class: "empty" }, "No groups for this course yet: be the first."));
-    for (const g of groups) box.append(await groupCard(g, false));
+    const cards = await Promise.all(groups.map((g) => groupCard(g, false)));
+    $("#course-groups").replaceChildren(...(cards.length ? cards
+      : [el("div", { class: "empty" }, "No groups for this course yet: be the first.")]));
   }
 
   async function groupCard(g, detailed) {

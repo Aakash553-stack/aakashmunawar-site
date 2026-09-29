@@ -27,11 +27,20 @@
       (or classmates to start one with) that share a course and are free when you are.</p>
   </header>
 
+  <p id="demo-banner" class="banner" hidden>You're using the shared demo account. The classmates and groups
+    you see are sample accounts marked "(demo)", kept apart from real students. Anything you change is visible to
+    other visitors until the server next restarts, when the demo resets.</p>
   <p id="status" class="status" role="status" aria-live="polite"></p>
 
   <!-- Sign up / log in -->
   <section id="view-auth" class="view" hidden>
     <div class="card narrow">
+      <div class="demo-box">
+        <button type="button" id="try-demo" class="primary wide">Try the demo: no sign-up</button>
+        <p class="hint">Logs in as <code>recruiter@example.com</code> / <code>demo1234</code>, a shared demo account
+          whose classmates and groups are sample accounts marked "(demo)". Real students never see them.</p>
+      </div>
+      <div class="divider"><span>or use your own account</span></div>
       <div class="tabs" role="tablist">
         <button type="button" role="tab" data-mode="login" aria-selected="true">Log in</button>
         <button type="button" role="tab" data-mode="signup" aria-selected="false">Sign up</button>
