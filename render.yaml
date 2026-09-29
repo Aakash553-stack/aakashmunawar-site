@@ -1,0 +1,38 @@
+# Render Blueprint for projects/study-group-matcher (Spring Boot API + PostgreSQL).
+# The rest of this repository is a static site deployed elsewhere; only
+# changes under the backend folder trigger a rebuild here.
+services:
+  - name: study-group-matcher-api
+    type: web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./projects/study-group-matcher/backend/Dockerfile
+    dockerContext: ./projects/study-group-matcher/backend
+    healthCheckPath: /actuator/health
+    buildFilter:
+      paths:
+        - projects/study-group-matcher/backend/**
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://study.aakashmunawar.com
+      - key: DB_HOST
+        fromDatabase: { name: study-group-matcher-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: study-group-matcher-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: study-group-matcher-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: study-group-matcher-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: study-group-matcher-db, property: password }
+
+databases:
+  - name: study-group-matcher-db
+    plan: free
+    databaseName: studygroups
+    user: studygroups
+    postgresMajorVersion: "17"
