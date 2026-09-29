@@ -1,0 +1,6 @@
+# Downloaded data and generated database: rebuild with scripts/fetch_data.py + scripts/load_data.py
+data/raw/*.csv
+*.db
+.venv/
+__pycache__/
+.ipynb_checkpoints/
