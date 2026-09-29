@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study Group Matcher</title>
+<meta name="description" content="Find study groups and classmates at Rutgers-New Brunswick with overlapping free time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back mono-label" href="https://aakashmunawar.com/#projects">← aakashmunawar.com</a>
+    <div class="title-row">
+      <h1>Study Group Matcher</h1>
+      <nav id="nav" class="nav" hidden>
+        <a href="#/matches">Matches</a>
+        <a href="#/groups">My groups</a>
+        <a href="#/profile">Profile</a>
+        <button type="button" id="logout" class="link">Log out</button>
+      </nav>
+    </div>
+    <p class="lede">Rutgers–New Brunswick students: add your courses and free time, then find study groups
+      (or classmates to start one with) that share a course and are free when you are.</p>
+  </header>
+
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+
+  <!-- Sign up / log in -->
+  <section id="view-auth" class="view" hidden>
+    <div class="card narrow">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-mode="login" aria-selected="true">Log in</button>
+        <button type="button" role="tab" data-mode="signup" aria-selected="false">Sign up</button>
+      </div>
+      <form id="auth-form" autocomplete="on">
+        <label class="field" data-only="signup" hidden>
+          <span class="mono-label">Name shown to classmates</span>
+          <input name="displayName" maxlength="60" autocomplete="nickname">
+        </label>
+        <label class="field">
+          <span class="mono-label">Email</span>
+          <input name="email" type="email" required autocomplete="email">
+        </label>
+        <label class="field">
+          <span class="mono-label">Password</span>
+          <input name="password" type="password" required minlength="8" maxlength="72" autocomplete="current-password">
+        </label>
+        <button type="submit" class="primary" id="auth-submit">Log in</button>
+        <p class="hint" data-only="signup" hidden>At least 8 characters. Your email is never shown to other students.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- Matches -->
+  <section id="view-matches" class="view" hidden>
+    <div class="section-label"><h2>Your matches</h2></div>
+    <p class="hint">Ranked by overlapping free time: only blocks of an hour or more count, since a 20-minute gap isn't a study session.
+      Groups show the time when you <em>and every member</em> are free.</p>
+    <div id="matches" class="list"></div>
+  </section>
+
+  <!-- Groups -->
+  <section id="view-groups" class="view" hidden>
+    <div class="section-label"><h2>My groups</h2></div>
+    <div id="my-groups" class="list"></div>
+
+    <div class="section-label"><h2>Browse &amp; create</h2></div>
+    <div class="card">
+      <label class="field inline">
+        <span class="mono-label">Course</span>
+        <select id="browse-course"></select>
+      </label>
+      <div id="course-groups" class="list"></div>
+      <form id="create-group" class="create">
+        <h3>Start a group for this course</h3>
+        <label class="field"><span class="mono-label">Name</span><input name="name" required maxlength="80" placeholder="e.g. Tuesday afternoon problem sets"></label>
+        <label class="field"><span class="mono-label">Description (optional)</span><input name="description" maxlength="500"></label>
+        <label class="field small"><span class="mono-label">Max members</span><input name="capacity" type="number" min="2" max="12" value="4" required></label>
+        <button type="submit" class="primary">Create group</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Profile -->
+  <section id="view-profile" class="view" hidden>
+    <div class="section-label"><h2>Courses</h2></div>
+    <div class="card">
+      <p class="hint">Fall 2026 Computer Science (198) and Math (640) courses from the Rutgers Schedule of Classes. Up to 10.</p>
+      <div id="my-courses" class="chips"></div>
+      <label class="field">
+        <span class="mono-label">Add a course</span>
+        <input id="course-search" placeholder="Search by number or title, e.g. 112 or calculus" autocomplete="off">
+      </label>
+      <div id="course-results" class="results"></div>
+    </div>
+
+    <div class="section-label"><h2>Weekly free time</h2></div>
+    <div class="card">
+      <p class="hint">Click or drag to mark when you're free to study each week. Half-hour cells.</p>
+      <div class="grid-scroll"><div id="week" class="week" role="grid" aria-label="Weekly free time"></div></div>
+      <div class="row">
+        <button type="button" id="save-free" class="primary">Save free time</button>
+        <button type="button" id="clear-free">Clear</button>
+        <span id="free-summary" class="hint"></span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    Java · Spring Boot · PostgreSQL. Course list: Rutgers Schedule of Classes, Fall 2026.
+    <a href="https://github.com/Aakash553-stack/aakashmunawar-site/tree/master/projects/study-group-matcher" target="_blank" rel="noopener">Source</a>
+  </footer>
+</div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
