@@ -1,4 +1,9 @@
-# Render Blueprint for projects/study-group-matcher (Spring Boot API + PostgreSQL).
+# Render Blueprint for projects/study-group-matcher: the Spring Boot API.
+# The database is a free Neon PostgreSQL instance (Render's free Postgres is
+# deleted after 30 days). When this Blueprint is first applied, Render asks for
+# the four DB_* values marked "sync: false"; copy them from Neon's connection
+# details (use the direct, non-pooled host).
+#
 # The rest of this repository is a static site deployed elsewhere; only
 # changes under the backend folder trigger a rebuild here.
 services:
@@ -6,6 +11,7 @@ services:
     type: web
     runtime: docker
     plan: free
+    region: virginia
     dockerfilePath: ./projects/study-group-matcher/backend/Dockerfile
     dockerContext: ./projects/study-group-matcher/backend
     healthCheckPath: /actuator/health
@@ -20,19 +26,14 @@ services:
       - key: CORS_ORIGINS
         value: https://study.aakashmunawar.com
       - key: DB_HOST
-        fromDatabase: { name: study-group-matcher-db, property: host }
-      - key: DB_PORT
-        fromDatabase: { name: study-group-matcher-db, property: port }
+        sync: false
       - key: DB_NAME
-        fromDatabase: { name: study-group-matcher-db, property: database }
+        sync: false
       - key: DB_USER
-        fromDatabase: { name: study-group-matcher-db, property: user }
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase: { name: study-group-matcher-db, property: password }
-
-databases:
-  - name: study-group-matcher-db
-    plan: free
-    databaseName: studygroups
-    user: studygroups
-    postgresMajorVersion: "17"
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_SSLMODE
+        value: require

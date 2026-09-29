@@ -27,7 +27,7 @@ Spring Boot API (Render, Docker, backend/)
    │  Spring Security: stateless JWT (HS256), BCrypt passwords
    │  REST controllers → services → matching algorithm (pure Java)
    ▼
-PostgreSQL (Render)      ← schema managed by Flyway migrations
+PostgreSQL (Neon)        ← schema managed by Flyway migrations
 ```
 
 **Why the frontend and backend are hosted separately:** a free Render instance sleeps after
@@ -256,29 +256,32 @@ bytes) and `CORS_ORIGINS`. Flyway creates the schema on first start.
 
 ## Deployment
 
-- **Backend and database: Render.** The [`render.yaml`](../../render.yaml) Blueprint at the
-  repo root defines:
-  - a free Docker web service built from
-    [`backend/Dockerfile`](backend/Dockerfile) (a multi-stage build, run as a non-root
-    user, with JVM settings for 512 MB),
-  - a free PostgreSQL database, with its connection details passed in as environment
-    variables,
-  - a JWT secret that Render generates.
+- **Backend: Render.** The [`render.yaml`](../../render.yaml) Blueprint at the repo root
+  defines a free Docker web service built from [`backend/Dockerfile`](backend/Dockerfile):
+  a multi-stage build, run as a non-root user, with JVM settings for a 512 MB instance.
+  Render generates the JWT secret, and only changes under `backend/` trigger a rebuild.
+- **Database: Neon,** a free PostgreSQL instance. The Blueprint asks for its connection
+  details (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) when it's first applied, so the
+  credentials live only in Render's environment settings, never in the repo. The app
+  connects with `sslmode=require`, and Flyway creates the schema on first start.
 - **Frontend: Vercel.** It's a static site with `frontend/` as the root directory, served
   at `study.aakashmunawar.com`. [`frontend/config.js`](frontend/config.js) holds the API
   address.
 
-**Why Render rather than Railway:** Railway's free plan now requires a credit card and gives
-$1 of usage and 0.5 GB of RAM per month, which is tight for a JVM plus PostgreSQL. Render's
-free web service needs no card.
+**Why Render for the API:** Railway's free plan now requires a credit card and gives $1 of
+usage and 0.5 GB of RAM per month, which is tight for a JVM. Render's free web service
+needs no card.
 
-**Free-tier limits that apply:**
+**Why Neon for the database:** Render's free PostgreSQL is deleted 30 days after it's
+created. Neon's free plan ($0, no card, 0.5 GB storage, 100 compute-hours a month) has no
+such limit.
+
+**Free-tier behavior:**
 
 - The API sleeps after 15 minutes without traffic, and the first request after that takes
-  about a minute. The frontend says so while it waits.
-- **A free Render PostgreSQL database expires 30 days after it's created**, and is deleted
-  after a 14-day grace period unless it's upgraded. For a long-lived deployment, point the
-  `DB_*` variables at a persistent Postgres instead, or upgrade the database.
+  about a minute. The frontend explains this while it waits.
+- Neon pauses compute after 5 idle minutes and resumes on the next query, adding a short
+  delay.
 
 ## Not built (yet)
 
