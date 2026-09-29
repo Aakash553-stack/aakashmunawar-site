@@ -1,0 +1,282 @@
+{
+  "source": "OpenStreetMap via the Overpass API",
+  "license": "Map data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+  "retrieved": "2026-09-28",
+  "locations": [
+    {
+      "id": "brower-commons",
+      "label": "Brower Commons",
+      "osm_name": "Brower Commons",
+      "category": "dining",
+      "campus": "College Avenue",
+      "lat": 40.5037697,
+      "lon": -74.4517446,
+      "osm": "relation/19181000",
+      "osm_url": "https://www.openstreetmap.org/relation/19181000"
+    },
+    {
+      "id": "alexander-library",
+      "label": "Alexander Library",
+      "osm_name": "Archibald S. Alexander Library",
+      "category": "library",
+      "campus": "College Avenue",
+      "lat": 40.5049354,
+      "lon": -74.4523837,
+      "osm": "way/251381216",
+      "osm_url": "https://www.openstreetmap.org/way/251381216"
+    },
+    {
+      "id": "college-ave-student-center",
+      "label": "College Ave Student Center",
+      "osm_name": "College Avenue Student Center",
+      "category": "student_center",
+      "campus": "College Avenue",
+      "lat": 40.5026368,
+      "lon": -74.4521745,
+      "osm": "way/251382259",
+      "osm_url": "https://www.openstreetmap.org/way/251382259"
+    },
+    {
+      "id": "scott-hall",
+      "label": "Scott Hall",
+      "osm_name": "Scott Hall",
+      "category": "academic",
+      "campus": "College Avenue",
+      "lat": 40.4998287,
+      "lon": -74.4476244,
+      "osm": "way/251382286",
+      "osm_url": "https://www.openstreetmap.org/way/251382286"
+    },
+    {
+      "id": "murray-hall",
+      "label": "Murray Hall",
+      "osm_name": "Murray Hall",
+      "category": "academic",
+      "campus": "College Avenue",
+      "lat": 40.500614,
+      "lon": -74.446561,
+      "osm": "way/251382144",
+      "osm_url": "https://www.openstreetmap.org/way/251382144"
+    },
+    {
+      "id": "the-yard",
+      "label": "The Yard (bus stop)",
+      "osm_name": "The Yard",
+      "category": "bus_stop",
+      "campus": "College Avenue",
+      "lat": 40.4995561,
+      "lon": -74.4483426,
+      "osm": "node/2924047495",
+      "osm_url": "https://www.openstreetmap.org/node/2924047495"
+    },
+    {
+      "id": "busch-dining-hall",
+      "label": "Busch Dining Hall",
+      "osm_name": "Busch Dining Hall",
+      "category": "dining",
+      "campus": "Busch",
+      "lat": 40.5226765,
+      "lon": -74.4578712,
+      "osm": "way/251381349",
+      "osm_url": "https://www.openstreetmap.org/way/251381349"
+    },
+    {
+      "id": "busch-student-center",
+      "label": "Busch Student Center",
+      "osm_name": "Busch Student Center",
+      "category": "student_center",
+      "campus": "Busch",
+      "lat": 40.5233409,
+      "lon": -74.4587739,
+      "osm": "way/251381343",
+      "osm_url": "https://www.openstreetmap.org/way/251381343"
+    },
+    {
+      "id": "library-of-science-medicine",
+      "label": "Library of Science & Medicine",
+      "osm_name": "Library Of Science & Medicine",
+      "category": "library",
+      "campus": "Busch",
+      "lat": 40.5248084,
+      "lon": -74.4671863,
+      "osm": "way/251381956",
+      "osm_url": "https://www.openstreetmap.org/way/251381956"
+    },
+    {
+      "id": "hill-center",
+      "label": "Hill Center",
+      "osm_name": "Hill Center Bldg For The Mathematical Sciences",
+      "category": "academic",
+      "campus": "Busch",
+      "lat": 40.5218853,
+      "lon": -74.4628355,
+      "osm": "way/251381866",
+      "osm_url": "https://www.openstreetmap.org/way/251381866"
+    },
+    {
+      "id": "weeks-hall-of-engineering",
+      "label": "Weeks Hall of Engineering",
+      "osm_name": "Richard Weeks Hall of Engineering",
+      "category": "academic",
+      "campus": "Busch",
+      "lat": 40.5243835,
+      "lon": -74.4596372,
+      "osm": "way/637575869",
+      "osm_url": "https://www.openstreetmap.org/way/637575869"
+    },
+    {
+      "id": "science-buildings",
+      "label": "Science Buildings (bus stop)",
+      "osm_name": "Science Buildings",
+      "category": "bus_stop",
+      "campus": "Busch",
+      "lat": 40.5238915,
+      "lon": -74.4641255,
+      "osm": "node/2924045306",
+      "osm_url": "https://www.openstreetmap.org/node/2924045306"
+    },
+    {
+      "id": "livingston-dining-commons",
+      "label": "Livingston Dining Commons",
+      "osm_name": "Livingston Dining Commons",
+      "category": "dining",
+      "campus": "Livingston",
+      "lat": 40.5228917,
+      "lon": -74.4381068,
+      "osm": "way/251381978",
+      "osm_url": "https://www.openstreetmap.org/way/251381978"
+    },
+    {
+      "id": "livingston-student-center",
+      "label": "Livingston Student Center",
+      "osm_name": "Livingston Student Center",
+      "category": "student_center",
+      "campus": "Livingston",
+      "lat": 40.5235656,
+      "lon": -74.4372106,
+      "osm": "way/251381998",
+      "osm_url": "https://www.openstreetmap.org/way/251381998"
+    },
+    {
+      "id": "james-dickson-carr-library",
+      "label": "James Dickson Carr Library",
+      "osm_name": "James Dickson Carr Library",
+      "category": "library",
+      "campus": "Livingston",
+      "lat": 40.522493,
+      "lon": -74.4374027,
+      "osm": "way/251381942",
+      "osm_url": "https://www.openstreetmap.org/way/251381942"
+    },
+    {
+      "id": "lucy-stone-hall",
+      "label": "Lucy Stone Hall",
+      "osm_name": "Lucy Stone Hall",
+      "category": "academic",
+      "campus": "Livingston",
+      "lat": 40.5217948,
+      "lon": -74.4350779,
+      "osm": "way/251382004",
+      "osm_url": "https://www.openstreetmap.org/way/251382004"
+    },
+    {
+      "id": "tillett-hall",
+      "label": "Tillett Hall",
+      "osm_name": "Tillett Hall",
+      "category": "academic",
+      "campus": "Livingston",
+      "lat": 40.5217411,
+      "lon": -74.4358331,
+      "osm": "way/251382356",
+      "osm_url": "https://www.openstreetmap.org/way/251382356"
+    },
+    {
+      "id": "livingston-plaza",
+      "label": "Livingston Plaza (bus stop)",
+      "osm_name": "Livingston Plaza",
+      "category": "bus_stop",
+      "campus": "Livingston",
+      "lat": 40.5250647,
+      "lon": -74.4385261,
+      "osm": "node/2305223108",
+      "osm_url": "https://www.openstreetmap.org/node/2305223108"
+    },
+    {
+      "id": "neilson-dining-hall",
+      "label": "Neilson Dining Hall",
+      "osm_name": "Neilson Dining Hall",
+      "category": "dining",
+      "campus": "Cook/Douglass",
+      "lat": 40.4817051,
+      "lon": -74.4315247,
+      "osm": "way/251382147",
+      "osm_url": "https://www.openstreetmap.org/way/251382147"
+    },
+    {
+      "id": "cook-student-center",
+      "label": "Cook Student Center",
+      "osm_name": "Cook Student Center",
+      "category": "student_center",
+      "campus": "Cook/Douglass",
+      "lat": 40.4791294,
+      "lon": -74.4313112,
+      "osm": "way/251381461",
+      "osm_url": "https://www.openstreetmap.org/way/251381461"
+    },
+    {
+      "id": "douglass-student-center",
+      "label": "Douglass Student Center",
+      "osm_name": "Douglass Student Center",
+      "category": "student_center",
+      "campus": "Cook/Douglass",
+      "lat": 40.4846978,
+      "lon": -74.4366434,
+      "osm": "way/251381599",
+      "osm_url": "https://www.openstreetmap.org/way/251381599"
+    },
+    {
+      "id": "douglass-library",
+      "label": "Douglass Library",
+      "osm_name": "Mabel Smith Douglass Library",
+      "category": "library",
+      "campus": "Cook/Douglass",
+      "lat": 40.4857255,
+      "lon": -74.4356559,
+      "osm": "way/251381606",
+      "osm_url": "https://www.openstreetmap.org/way/251381606"
+    },
+    {
+      "id": "college-hall",
+      "label": "College Hall",
+      "osm_name": "College Hall",
+      "category": "academic",
+      "campus": "Cook/Douglass",
+      "lat": 40.4865954,
+      "lon": -74.4372264,
+      "osm": "way/251381436",
+      "osm_url": "https://www.openstreetmap.org/way/251381436"
+    },
+    {
+      "id": "biel-road",
+      "label": "Biel Road (bus stop)",
+      "osm_name": "Biel Road",
+      "category": "bus_stop",
+      "campus": "Cook/Douglass",
+      "lat": 40.4799273,
+      "lon": -74.4324921,
+      "osm": "node/4386539642",
+      "osm_url": "https://www.openstreetmap.org/node/4386539642"
+    },
+    {
+      "id": "landing-lane-bridge",
+      "label": "Landing Lane Bridge",
+      "osm_name": "Landing Lane",
+      "category": "waypoint",
+      "campus": "Raritan River",
+      "lat": 40.5086354,
+      "lon": -74.4638308,
+      "osm": "way/38606657",
+      "osm_url": "https://www.openstreetmap.org/way/38606657"
+    }
+  ]
+}
