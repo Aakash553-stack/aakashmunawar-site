@@ -36,6 +36,6 @@ Alternatively, GitHub Pages works too — a `CNAME` file with the domain is alre
 - Projects: `<section id="work">` — the HackRU feature card, then one `<article class="card">` per
   project. A card's `data-tags` (`fullstack`, `data`, `algorithms`) decide which filter shows it.
 - About, skills: `<section id="about">`, `<section id="skills">`
-- Résumé: `<section id="resume">`. The "Save as PDF" button prints the page, and the print
-  stylesheet at the end of the `<style>` hides everything except the résumé.
+- Résumé: `<section id="resume">`. For now it offers a "Request by email" button. To add a
+  PDF download, the Vercel build command must also copy the PDF into `dist/` (see Deploying).
 - Contact: `<section id="contact">`

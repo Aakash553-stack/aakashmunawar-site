@@ -547,35 +547,21 @@
   .coursework p{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);}
 
   /* ---------- Résumé ---------- */
-  .resume-grid{display:grid;gap:clamp(28px, 4vw, 48px);align-items:start;}
-  @media (min-width:960px){.resume-grid{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);}}
-  @media (min-width:960px){.resume-intro{position:sticky;top:110px;}}
-  .resume-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
-  .resume-actions .note{flex-basis:100%;}
-  .js-only{display:none;}
-  .js .js-only{display:inline-flex;}
-  .resume-doc{
-    border-radius:var(--radius);border:1px solid var(--line-2);
-    background:linear-gradient(180deg, #0e1628, #0b1222);
-    padding:clamp(22px, 4vw, 40px);box-shadow:var(--shadow);
-    font-size:.92rem;line-height:1.55;
+  .resume-card{
+    display:grid;gap:22px;align-items:center;
+    padding:clamp(24px, 4vw, 40px);border-radius:var(--radius);
+    border:1px solid var(--line-2);box-shadow:var(--shadow);
+    background:
+      radial-gradient(60% 120% at 0% 0%, rgba(79,140,255,.1), transparent 60%),
+      linear-gradient(180deg, var(--surface-2), var(--surface));
   }
-  .rd-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px 24px;padding-bottom:18px;border-bottom:1px solid var(--line-2);}
-  .rd-head h3{font-size:1.6rem;letter-spacing:-.03em;}
-  .rd-head p{color:var(--text-2);}
-  .rd-contact{list-style:none;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.84rem;}
-  .rd-contact a{color:var(--text-2);text-decoration:none;}
-  .rd-contact a:hover{color:var(--accent-2);}
-  .rd-sec{display:grid;gap:10px;padding-top:18px;}
-  .rd-sec h4{font-family:var(--mono);font-size:.7rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-2);}
-  .rd-item{display:grid;gap:3px;}
-  .rd-item .rd-title{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;color:var(--text);font-weight:600;}
-  .rd-item .rd-title span{font-weight:400;color:var(--text-3);font-size:.84rem;}
-  .rd-item ul{list-style:none;display:grid;gap:3px;}
-  .rd-item li{position:relative;padding-left:14px;color:var(--text-2);}
-  .rd-item li::before{content:"";position:absolute;left:2px;top:.68em;width:4px;height:4px;border-radius:50%;background:var(--text-3);}
-  .rd-skills{display:grid;gap:4px;color:var(--text-2);}
-  .rd-skills b{color:var(--text);font-weight:600;}
+  @media (min-width:760px){.resume-card{grid-template-columns:auto minmax(0,1fr) auto;gap:28px;}}
+  .resume-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:16px;color:var(--accent-2);background:var(--accent-soft);border:1px solid var(--accent-line);}
+  .resume-icon .i{width:26px;height:26px;}
+  .resume-copy{display:grid;gap:10px;}
+  .resume-copy h2{font-size:clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem);line-height:1.1;letter-spacing:-.03em;}
+  .resume-copy p{color:var(--text-2);max-width:56ch;}
+  @media (max-width:519px){.resume-card .btn{width:100%;}}
 
   /* ---------- Contact ---------- */
   .contact{
@@ -650,24 +636,6 @@
     .card:hover{transform:none;}
   }
 
-  /* ---------- Print: the résumé only ---------- */
-  @media print{
-    @page{size:letter;margin:.5in .6in;}
-    html,body{background:#fff !important;color:#111 !important;font-size:10.5pt;}
-    .backdrop,.skip,.site-header,.site-footer,main > :not(#resume),#resume .resume-intro{display:none !important;}
-    #resume{padding:0 !important;}
-    #resume .wrap{padding:0;max-width:none;}
-    .resume-grid{display:block;}
-    .resume-doc{border:0;background:none;box-shadow:none;padding:0;font-size:10pt;line-height:1.4;}
-    .resume-doc *{color:#111 !important;}
-    .rd-head{border-bottom:1.5px solid #111;}
-    .rd-head h3{font-size:20pt;}
-    .rd-contact a{text-decoration:none;}
-    .rd-sec{padding-top:10pt;gap:5pt;break-inside:avoid;}
-    .rd-sec h4{color:#1d4ed8 !important;font-size:8.5pt;}
-    .rd-item{break-inside:avoid;}
-    .rd-item li::before{background:#555;}
-  }
 </style>
 </head>
 <body>
@@ -676,7 +644,6 @@
   <symbol id="i-linkedin" viewBox="0 0 16 16"><path fill="currentColor" d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect class="i-stroke" x="3" y="5" width="18" height="14" rx="2.5"/><path class="i-stroke" d="m4 7 8 6 8-6"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path class="i-stroke" d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
-  <symbol id="i-down" viewBox="0 0 24 24"><path class="i-stroke" d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect class="i-stroke" x="8" y="8" width="12" height="12" rx="2.5"/><path class="i-stroke" d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></symbol>
   <symbol id="i-award" viewBox="0 0 24 24"><circle class="i-stroke" cx="12" cy="9" r="5.5"/><path class="i-stroke" d="m8.5 13.5-1.5 7 5-2.5 5 2.5-1.5-7"/></symbol>
   <symbol id="i-doc" viewBox="0 0 24 24"><path class="i-stroke" d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path class="i-stroke" d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
@@ -1039,84 +1006,14 @@
   <!-- ===== Résumé ===== -->
   <section id="resume" aria-labelledby="resume-title">
     <div class="wrap">
-      <div class="resume-grid">
-        <div class="resume-intro" data-reveal>
-          <div class="section-head" style="margin-bottom:0">
-            <span class="eyebrow">Résumé</span>
-            <h2 id="resume-title">The <span class="serif">one-page</span> version</h2>
-            <p>Everything above, on one page. Save it as a PDF, or email me and I'll send my latest résumé.</p>
-          </div>
-          <div class="resume-actions">
-            <button class="btn btn-primary js-only" type="button" data-print><svg class="i" aria-hidden="true"><use href="#i-down"/></svg>Save as PDF</button>
-            <a class="btn" href="mailto:aakashmunawar.dev@gmail.com?subject=R%C3%A9sum%C3%A9%20request"><svg class="i" aria-hidden="true"><use href="#i-mail"/></svg>Request by email</a>
-            <p class="note js-only">Opens your browser's print dialog. Choose "Save as PDF".</p>
-          </div>
+      <div class="resume-card" data-reveal>
+        <span class="resume-icon" aria-hidden="true"><svg class="i"><use href="#i-doc"/></svg></span>
+        <div class="resume-copy">
+          <span class="eyebrow">Résumé</span>
+          <h2 id="resume-title">My résumé, <span class="serif">on request</span></h2>
+          <p>Email me and I'll reply with my current résumé as a PDF.</p>
         </div>
-
-        <article class="resume-doc" aria-label="Résumé" data-reveal>
-          <header class="rd-head">
-            <div>
-              <h3>Aakash Munawar</h3>
-              <p>Computer Science · Rutgers University–New Brunswick</p>
-            </div>
-            <ul class="rd-contact">
-              <li><a href="mailto:aakashmunawar.dev@gmail.com">aakashmunawar.dev@gmail.com</a></li>
-              <li><a href="https://aakashmunawar.com">aakashmunawar.com</a></li>
-              <li><a href="https://github.com/Aakash553-stack">github.com/Aakash553-stack</a></li>
-              <li><a href="https://www.linkedin.com/in/aakash-munawar-760019268">linkedin.com/in/aakash-munawar-760019268</a></li>
-            </ul>
-          </header>
-
-          <div class="rd-sec">
-            <h4>Education</h4>
-            <div class="rd-item"><p class="rd-title">Rutgers University–New Brunswick <span>Computer Science</span></p></div>
-            <div class="rd-item"><p class="rd-title">Raritan Valley Community College <span>Computer Science coursework, before transferring</span></p></div>
-          </div>
-
-          <div class="rd-sec">
-            <h4>Award</h4>
-            <div class="rd-item">
-              <p class="rd-title">HackRU 2026, Best Regeneron Entry <span>Protocol Pre-Flight · team project</span></p>
-              <ul><li>Built the Next.js and TypeScript frontend: the upload page, the PDF review workspace that highlights each finding on the page it cites, and the typed API layer connecting to the team's FastAPI backend.</li></ul>
-            </div>
-          </div>
-
-          <div class="rd-sec">
-            <h4>Projects</h4>
-            <div class="rd-item">
-              <p class="rd-title">Study Group Matcher <span>Java, Spring Boot, Spring Security, PostgreSQL</span></p>
-              <ul>
-                <li>Full-stack app matching students by shared courses and overlapping free time; live at study.aakashmunawar.com.</li>
-                <li>Interval-merge matching algorithm checked against a brute-force model; 41 JUnit tests pass. JWT auth, BCrypt, row-level locking.</li>
-              </ul>
-            </div>
-            <div class="rd-item">
-              <p class="rd-title">Chicago Crime Explorer <span>Python, SQLite, FastAPI, Chart.js</span></p>
-              <ul><li>Normalized schema over nearly 480,000 incident records; FastAPI dashboard reuses the notebook's SQL with parameterized filters; 19 API tests.</li></ul>
-            </div>
-            <div class="rd-item">
-              <p class="rd-title">Schedule Builder <span>Python</span></p>
-              <ul><li>Backtracking search over real Rutgers sections; 5.9× faster than brute force on a 5-course search, with 18 tests confirming identical results.</li></ul>
-            </div>
-            <div class="rd-item">
-              <p class="rd-title">Campus Route Finder <span>Python</span></p>
-              <ul><li>Dijkstra and a binary-heap priority queue from scratch over 24 OpenStreetMap locations; verified against Floyd–Warshall on every pair.</li></ul>
-            </div>
-            <div class="rd-item">
-              <p class="rd-title">OpsTrack (in progress) <span>FastAPI, PostgreSQL, SQLAlchemy, Alembic</span></p>
-              <ul><li>13-table 3NF PostgreSQL schema; Alembic migration verified identical with a pg_dump diff; REST API for all 13 resources.</li></ul>
-            </div>
-          </div>
-
-          <div class="rd-sec">
-            <h4>Skills</h4>
-            <div class="rd-skills">
-              <p><b>Languages:</b> Java, Python, SQL, TypeScript, JavaScript, HTML/CSS</p>
-              <p><b>Frameworks:</b> Spring Boot, Spring Security, JPA, FastAPI, SQLAlchemy, React, Next.js, Tailwind CSS</p>
-              <p><b>Data &amp; tools:</b> PostgreSQL, SQLite, Flyway, Alembic, pandas, Jupyter, JUnit, pytest, Git, Docker, Vercel, Render</p>
-            </div>
-          </div>
-        </article>
+        <a class="btn btn-primary" href="mailto:aakashmunawar.dev@gmail.com?subject=R%C3%A9sum%C3%A9%20request"><svg class="i" aria-hidden="true"><use href="#i-mail"/></svg>Request by email</a>
       </div>
     </div>
   </section>
@@ -1258,8 +1155,6 @@
     setTimeout(() => { label.textContent = "Copy"; }, 2000);
   }));
 
-  // Résumé: print just the résumé (see the print stylesheet).
-  document.querySelectorAll("[data-print]").forEach((btn) => btn.addEventListener("click", () => print()));
 })();
 </script>
 </body>
