@@ -9,7 +9,7 @@
 //
 // Rendering is on demand: frames are drawn only while something moves (the lid,
 // the display powering on, the pointer tilt), so an idle hero costs nothing.
-import * as THREE from "three";
+import * as THREE from "./three/three.module.min.js";
 import { RoundedBoxGeometry } from "./three/addons/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "./three/addons/RoomEnvironment.js";
 
@@ -27,6 +27,9 @@ const U = 0.18, KEY_GAP = 0.028;     // key pitch and the gap between caps
 const KEY_TOP = BASE_H + 0.006;      // keys stand just proud of the deck
 const YAW = -0.3;                    // turned slightly toward the hero text
 const ELEVATION = 20 * DEG;          // camera height above the desk
+
+// Lighter settings for phones and tablets (set in init).
+const quality = { bevelSegments: 6, curveSegments: 18, textureSize: 256 };
 
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
@@ -67,7 +70,7 @@ function smooth(geo) {
 function slab(w, d, h, r, bevel) {
   const g = new THREE.ExtrudeGeometry(roundedRect(w - 2 * bevel, d - 2 * bevel, r - bevel), {
     depth: h - 2 * bevel, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel,
-    bevelSegments: 6, curveSegments: 18,
+    bevelSegments: quality.bevelSegments, curveSegments: quality.curveSegments,
   });
   g.rotateX(-Math.PI / 2);
   g.translate(0, bevel, 0);
@@ -83,7 +86,7 @@ function plate(w, d, r, faceDown = false) {
 
 // Fine horizontal brushing, used as a roughness map on the aluminium.
 function brushedTexture() {
-  const size = 256, data = new Uint8Array(size * size * 4);
+  const size = quality.textureSize, data = new Uint8Array(size * size * 4);
   for (let y = 0; y < size; y++) {
     const row = Math.random();
     for (let x = 0; x < size; x++) {
@@ -97,11 +100,17 @@ function brushedTexture() {
 }
 
 // A soft blurred rectangle, for the contact shadow directly under the base.
+// The shape is drawn off-canvas and only its blurred shadow lands on it, which
+// works everywhere (Safari ignores ctx.filter and lacks roundRect before 16).
 function contactShadowTexture() {
   const c = document.createElement("canvas"); c.width = c.height = 256;
   const g = c.getContext("2d");
-  g.filter = "blur(16px)"; g.fillStyle = "#000";
-  g.beginPath(); g.roundRect(34, 40, 188, 176, 22); g.fill();
+  const x = 34 - 1000, y = 40, w = 188, h = 176, r = 22;
+  g.shadowColor = "#000"; g.shadowBlur = 32; g.shadowOffsetX = 1000;
+  g.beginPath();
+  g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  g.fillStyle = "#000"; g.fill();
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
@@ -165,7 +174,7 @@ function buildKeyboard(group, keyMat, kbBackZ) {
     g.fillText(s, (i % cols) * cell + cell / 2, Math.floor(i / cols) * cell + cell / 2 + 1);
   });
   const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = quality.anisotropy || 8;
 
   const P = [], UV = [], I = [];
   for (const k of keys) {
@@ -187,7 +196,7 @@ function buildKeyboard(group, keyMat, kbBackZ) {
   return legendMat;
 }
 
-export async function init(hub, { reduceMotion = false } = {}) {
+export async function init(hub, { reduceMotion = false, onFail = () => {} } = {}) {
   const stage = hub.querySelector("[data-stage]");
   const screenEl = hub.querySelector("#laptop-screen");
   const toggle = hub.querySelector(".lid-toggle");
@@ -195,10 +204,13 @@ export async function init(hub, { reduceMotion = false } = {}) {
   const panel = hub.querySelector("#hub-panel");
   const status = hub.querySelector("[data-hub-status]");
   const small = matchMedia("(max-width: 599px)");
+  // Phones and tablets: fewer pixels and segments, smaller textures and shadow map.
+  const lowPower = small.matches || matchMedia("(pointer: coarse)").matches;
+  if (lowPower) Object.assign(quality, { bevelSegments: 4, curveSegments: 10, textureSize: 128, anisotropy: 4 });
 
   // ---------- Renderers ----------
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, lowPower ? 1.75 : 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -301,7 +313,7 @@ export async function init(hub, { reduceMotion = false } = {}) {
   const key = new THREE.DirectionalLight(0xffffff, 2.3);
   key.position.set(-3.5, 6.5, 4.5);
   key.castShadow = true;
-  key.shadow.mapSize.set(small.matches ? 1024 : 2048, small.matches ? 1024 : 2048);
+  key.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
   Object.assign(key.shadow.camera, { left: -3.4, right: 3.4, top: 3.4, bottom: -3.4, near: 1, far: 20 });
   key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
   scene.add(key);
@@ -545,6 +557,14 @@ export async function init(hub, { reduceMotion = false } = {}) {
     hub.addEventListener("pointerleave", () => { pointer.tx = pointer.ty = 0; kick(); });
   }
 
+  // ---------- Lost GPU context ----------
+  let lostTimer = 0;
+  renderer.domElement.addEventListener("webglcontextlost", (e) => {
+    e.preventDefault();
+    lostTimer = setTimeout(() => onFail("WebGL context was lost and not restored"), 5000);
+  });
+  renderer.domElement.addEventListener("webglcontextrestored", () => { clearTimeout(lostTimer); frame(); });
+
   // ---------- Size ----------
   new ResizeObserver(() => frame()).observe(stage);
   small.addEventListener("change", frame);
@@ -564,7 +584,7 @@ export async function init(hub, { reduceMotion = false } = {}) {
     inspect() {
       scene.updateMatrixWorld(true);
       const top = new THREE.Vector3(0, 0, D).applyMatrix4(lid.matrix);
-      return { frames, base: base.matrix.toArray().map((n) => +n.toFixed(5)), pivot: lid.position.toArray().map((n) => +n.toFixed(5)), lidTop: top.toArray().map((n) => +n.toFixed(4)) };
+      return { frames, pixelRatio: renderer.getPixelRatio(), shadowMap: key.shadow.mapSize.x, quality: { ...quality }, triangles: renderer.info.render.triangles, base: base.matrix.toArray().map((n) => +n.toFixed(5)), pivot: lid.position.toArray().map((n) => +n.toFixed(5)), lidTop: top.toArray().map((n) => +n.toFixed(4)) };
     },
   };
   hub.laptop3d = api;

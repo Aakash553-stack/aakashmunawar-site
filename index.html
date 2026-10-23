@@ -648,6 +648,8 @@
     transition:background-color .2s var(--ease), box-shadow .2s var(--ease), transform .12s var(--ease);
   }
   .lid-toggle[hidden]{display:none;}
+  .hub :is(button, a){touch-action:manipulation;}
+  .hub-debug{margin:10px auto 0;max-width:600px;font:500 .72rem/1.4 var(--mono);color:var(--text-3);overflow-wrap:anywhere;}
   .lid-toggle .i{width:16px;height:16px;color:var(--accent-3);}
   .lid-toggle:hover:not(:disabled){box-shadow:0 10px 24px -14px rgba(0,0,0,.8), 0 0 24px -6px rgba(105,167,255,.8);}
   .lid-toggle:active:not(:disabled){transform:translateX(-50%) scale(.97);}
@@ -724,7 +726,7 @@
 
   @media (max-width:599px){
     .hub.has-3d .stage3d{position:relative;inset:auto;aspect-ratio:600 / 430;order:0;}
-    .hub.has-3d .lid-toggle{position:static;transform:none;justify-self:center;order:1;}
+    .hub.has-3d .lid-toggle{position:static;transform:none;justify-self:center;order:1;min-height:48px;padding:0 22px;font-size:1rem;}
     .hub.has-3d .lid-toggle:active:not(:disabled){transform:scale(.97);}
     .hub.has-3d .hub-cards{order:2;position:static;pointer-events:auto;}
     .hub.has-3d .hub-pause{order:3;}
@@ -898,7 +900,6 @@
   }
 
 </style>
-<script type="importmap">{"imports":{"three":"/assets/three/three.module.min.js"}}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -1503,20 +1504,42 @@
     document.addEventListener("visibilitychange", () => hub.classList.toggle("is-offscreen", document.hidden));
   }
 
-  // 3D laptop: a progressive enhancement. It needs WebGL2; without it (or if
-  // the module fails to load) the HTML/CSS laptop stays. Loaded after the page.
+  // 3D laptop: a progressive enhancement. It needs WebGL2; without it, or if
+  // the module fails, the HTML/CSS laptop stays. Loaded after the page.
+  // hub.dataset.mode records what happened; add ?debug3d to the URL to see it.
   if (hub) {
+    const debug = /[?&]debug3d\b/.test(location.search);
+    const report = (mode) => {
+      hub.dataset.mode = mode;
+      if (!debug) return;
+      let out = hub.querySelector(".hub-debug");
+      if (!out) { out = document.createElement("p"); out.className = "hub-debug"; hub.after(out); }
+      out.textContent = `3D: ${mode} · reduced motion: ${reduceMotion ? "on" : "off"} · ${navigator.userAgent}`;
+    };
     const webgl2 = (() => { try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; } })();
-    const saveData = navigator.connection && navigator.connection.saveData;
-    if (webgl2 && !saveData) {
+    if (!webgl2) report("fallback (WebGL2 unavailable)");
+    else {
       const stage = hub.querySelector("[data-stage]"), toggle = hub.querySelector(".lid-toggle");
       hub.classList.add("has-3d");
       stage.hidden = false; toggle.hidden = false;
-      const start = () => import("/assets/laptop3d.js").then((m) => m.init(hub, { reduceMotion })).catch((err) => {
-        console.warn("3D laptop unavailable; showing the HTML version.", err);
-        hub.classList.remove("has-3d", "is-ready");
+      report("loading");
+      let timer = 0;
+      const fallback = (why) => {
+        clearTimeout(timer);
+        if (hub.dataset.mode.startsWith("fallback")) return;
+        console.warn("3D laptop unavailable; showing the HTML version.", why);
+        report(`fallback (${why})`);
+        hub.classList.remove("has-3d", "is-ready", "is-open", "is-on", "has-panel");
         stage.hidden = true; toggle.hidden = true;
-      });
+        hub.querySelector("#hub-panel").hidden = true;
+      };
+      const start = () => {
+        timer = setTimeout(() => fallback("took longer than 20 s to load"), 20000);
+        import("/assets/laptop3d.js")
+          .then((m) => m.init(hub, { reduceMotion, onFail: fallback }))
+          .then(() => { clearTimeout(timer); if (hub.dataset.mode === "loading") report("3d"); })
+          .catch((err) => fallback((err && err.message) || String(err)));
+      };
       if (document.readyState === "complete") start(); else addEventListener("load", start, { once: true });
     }
   }

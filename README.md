@@ -8,12 +8,14 @@ Personal portfolio site for Aakash Munawar — CS student at Rutgers University�
   the project illustrations (inline SVG) are all inside it. The only external request is Google
   Fonts, which loads without blocking the first paint.
 - `assets/laptop3d.js` — the 3D laptop in the hero, modelled in code (no downloaded model). It
-  loads after the page, only where WebGL2 is available; otherwise the HTML/CSS laptop in
+  loads after the page wherever WebGL2 is available, phones included (with lighter settings on
+  touch devices); otherwise, or if it fails or loses its GPU context, the HTML/CSS laptop in
   `index.html` is shown. Its screen is real HTML (`#laptop-screen`) and its pop-out panels are
-  `#hub-panel`, both in `index.html`.
-- `assets/three/` — [three.js](https://threejs.org) r170 (MIT, see `assets/three/LICENSE`), copied
-  unmodified from the `three@0.170.0` npm package: `build/three.module.min.js` plus two addons.
-  It is served from this site; `index.html` has an import map that points `three` at it.
+  `#hub-panel`, both in `index.html`. Add `?debug3d` to the URL to see which mode loaded and why.
+- `assets/three/` — [three.js](https://threejs.org) r170 (MIT, see `assets/three/LICENSE`) from
+  the `three@0.170.0` npm package: `build/three.module.min.js` unmodified, plus two addons whose
+  only change is importing three by relative path (`'../three.module.min.js'` instead of
+  `'three'`), so no import map is needed and older mobile browsers can load them.
 - `resume.pdf` — the one-page résumé linked from the site, built by `resume/build_resume.py`.
 - `projects/` — source for the projects shown on the site. Each one has its own README, and the
   live ones deploy separately (see each project's README).
